@@ -6,7 +6,7 @@ import os
 from btree import Btree
 import shutil
 from misc import split_condition
-
+#ndnefo
 class Database:
     '''
     Database class contains tables.
