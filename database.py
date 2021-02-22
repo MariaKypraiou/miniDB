@@ -654,6 +654,6 @@ class Database:
                   else:
                       res.show()
 
-             else:
+              else:
                   print(f'Error! Index not found.')
                   return
