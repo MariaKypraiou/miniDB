@@ -534,7 +534,7 @@ class Table:
           print(f'# Right table size -> {len(table_right.data)}')
 
           return join_table
-          
+
     def _index_nested_loop_join(self, table_right: Table, index, condition):
 
            # get columns and operator
