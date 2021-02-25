@@ -421,8 +421,9 @@ class Table:
                nulls.append(0)
              join_table._insert(row_left+nulls)
              newrow+=1
-             join_table.data[newrow-1][column]='None'
-             join_table.update()
+             for columns in range(table_right._no_of_columns):
+                 join_table.data[newrow-1][columns+self._no_of_columns]='None'
+                 join_table.update()
 
         print(f'## Select ops no. -> {no_of_ops}')
         print(f'# Left table size -> {len(self.data)}')
