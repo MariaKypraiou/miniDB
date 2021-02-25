@@ -570,7 +570,7 @@ class Table:
 
            return join_table
 
-    def _sort_merge_join(self, table_right: Table, condition):
+    def _sort_merge_join(self, table_right: Table, condition, asc):
 
            # get columns and operator
            column_name_left, operator, column_name_right = self._parse_condition(condition, join=True)
@@ -593,8 +593,8 @@ class Table:
            join_table_coltypes = self.column_types+table_right.column_types
            join_table = Table(name=join_table_name, column_names=join_table_colnames, column_types= join_table_coltypes)
 
-           self._sort(column_name_left,asc=False)
-           table_right._sort(column_name_right,asc=False)
+           self._sort(column_name_left,asc=asc)
+           table_right._sort(column_name_right,asc=asc)
 
            for row_left in self.data:
 
@@ -605,8 +605,12 @@ class Table:
               if get_op(operator, right_value, left_value):
                 join_table._insert(row_left+row_right)
               else:
-                if left_value>right_value:
-                  break
+                  if asc==False:
+                    if left_value>right_value:
+                       break
+                  else:
+                       if left_value<right_value:
+                           break
 
            print(f'## Select ops no. -> {no_of_ops}')
            print(f'# Left table size -> {len(self.data)}')
