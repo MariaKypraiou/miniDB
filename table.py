@@ -402,8 +402,8 @@ class Table:
 
         # count the number of operations (<,> etc)
         no_of_ops = 0
-        nulls = []
-        newrow = 0
+        nulls = [] # enter 0 as many as the columns of the right table
+        newrow = 0 # counts rows in join_table
         # for each value in left column and right column, if condition, append the corresponding row to the new table
         for row_left in self.data:
             nulls.clear()
@@ -416,12 +416,12 @@ class Table:
                     join_table._insert(row_left+row_right)
                     newrow+=1
                     found=True
-            if not found:
+            if not found: # if not found match in the right table, then for ever column of th rigth table enter 0 in nulls
              for columns in range(table_right._no_of_columns):
                nulls.append(0)
-             join_table._insert(row_left+nulls)
-             newrow+=1
-             for columns in range(table_right._no_of_columns):
+             join_table._insert(row_left+nulls) # append left table's values and null into join table
+             newrow+=1 # new row in join table
+             for columns in range(table_right._no_of_columns): # change every 0 column to null
                  join_table.data[newrow-1][columns+self._no_of_columns]='Null'
                  join_table.update()
 
