@@ -416,7 +416,7 @@ class Table:
                     join_table._insert(row_left+row_right)
                     newrow+=1
                     found=True
-            if not found: # if not found match in the right table, then for ever column of th rigth table enter 0 in nulls
+            if not found: # if not found match in the right table, then for ever column of the rigth table enter 0 in nulls
              for columns in range(table_right._no_of_columns):
                nulls.append(0)
              join_table._insert(row_left+nulls) # append left table's values and null into join table
@@ -455,7 +455,9 @@ class Table:
 
          # count the number of operations (<,> etc)
          no_of_ops = 0
-         nulls=[]
+         nulls = [] # enter 0 as many as the columns of the right table
+         newrow = 0 # counts rows in join_table
+
          # for each value in left column and right column, if condition, append the corresponding row to the new table
          for row_right in table_right.data:
              nulls.clear()
@@ -466,8 +468,9 @@ class Table:
                  no_of_ops+=1
                  if get_op(operator, right_value, left_value): #EQ_OP
                      join_table._insert(row_left+row_right)
+                     newrow+=1
                      found=True
-             if not found:
+             if not found:# if not found match in the right table, then for ever column of the rigth table enter 0 in nulls
               for columns in range(self._no_of_columns):
                 nulls.append(0)
               join_table._insert(nulls+row_right)
@@ -503,8 +506,9 @@ class Table:
 
           # count the number of operations (<,> etc)
           no_of_ops = 0
-          nulls=[]
-          SameValues=[]
+          nulls=[] # enter as many 0 as the columns of the right table
+          SameValues=[] # values that we have already enter in the join_table
+          newrow=0 # count rows in the join_table
 
           # for each value in left column and right column, if condition, append the corresponding row to the new table
           for row_left in self.data:
@@ -516,6 +520,7 @@ class Table:
                   no_of_ops+=1
                   if get_op(operator, left_value, right_value): #EQ_OP
                       join_table._insert(row_left+row_right)
+                      newrow+=1 # new row in the join_table
                       found=True
                       SameValues.append(row_right)
               if not found:
