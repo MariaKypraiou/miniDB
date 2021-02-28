@@ -596,6 +596,7 @@ class Table:
                 row_right = table_right.data[found[0]]
                 join_table._insert(row_left+row_right)
 
+
            print(f'# Left table size -> {len(self.data)}')
            print(f'# Right table size -> {len(table_right.data)}')
 
@@ -644,6 +645,8 @@ class Table:
                   else:#if sorting is ascending ,if left value < right value we don't need to check for match
                     if left_value<right_value:
                         break
+
+                        
            print(f'## Select ops no. -> {no_of_ops}')
            print(f'# Left table size -> {len(self.data)}')
            print(f'# Right table size -> {len(table_right.data)}')
