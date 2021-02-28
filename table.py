@@ -402,8 +402,10 @@ class Table:
 
         # count the number of operations (<,> etc)
         no_of_ops = 0
+
         nulls = [] # enter 0 as many as the columns of the right table
         newrow = 0 # counts rows in join_table
+
         # for each value in left column and right column, if condition, append the corresponding row to the new table
         for row_left in self.data:
             nulls.clear()
@@ -414,7 +416,7 @@ class Table:
                 no_of_ops+=1
                 if get_op(operator, left_value, right_value): #EQ_OP
                     join_table._insert(row_left+row_right)
-                    newrow+=1
+                    newrow+=1 # new row in join table
                     found=True
             if not found: # if not found match in the right table, then for ever column of the rigth table enter 0 in nulls
              for columns in range(table_right._no_of_columns):
@@ -455,6 +457,7 @@ class Table:
 
          # count the number of operations (<,> etc)
          no_of_ops = 0
+
          nulls = [] # enter 0 as many as the columns of the right table
          newrow = 0 # counts rows in join_table
 
@@ -465,15 +468,21 @@ class Table:
              found=False
              for row_left in self.data:
                  left_value = row_left[column_index_left]
-                 no_of_ops+=1
+                 no_of_ops+=1 # new row in join table
                  if get_op(operator, right_value, left_value): #EQ_OP
                      join_table._insert(row_left+row_right)
-                     newrow+=1
+                     newrow+=1 # new row in join table
                      found=True
              if not found:# if not found match in the right table, then for ever column of the rigth table enter 0 in nulls
               for columns in range(self._no_of_columns):
                 nulls.append(0)
               join_table._insert(nulls+row_right)
+
+              newrow+=1
+              for columns in range(self._no_of_columns):# change every 0 column to Null
+                join_table.data[newrow-1][columns]='Null'
+                join_table._update()
+
 
          print(f'## Select ops no. -> {no_of_ops}')
          print(f'# Left table size -> {len(self.data)}')
@@ -523,13 +532,18 @@ class Table:
                       newrow+=1 # new row in the join_table
                       found=True
                       SameValues.append(row_right)
-              if not found:
+              if not found: # if not fount match in the right table, then for every column of the right table enter 0 to nulls
                for columns in range(table_right._no_of_columns):
                  nulls.append(0)
-               join_table._insert(row_left+nulls)
+               join_table._insert(row_left+nulls)#append left table's values and nulls into join table
+               newrow+=1# new row in join table
+               for columns in range(table_right._no_of_columns):# change every 0 column to Null
+                 join_table.data[newrow-1][columns+self._no_of_columns]='Null'
+                 join_table._update()
 
+          #for each value in right column, check if it exists in SameValues. If not then add it to the join_table with null in left columns
           for row_right in table_right.data:
-              right=False
+              right=False #found right column in SameVlaues
               nulls.clear()
               for j in range(len(SameValues)):
                   if SameValues[j]==row_right:
@@ -537,7 +551,11 @@ class Table:
               if not right:
                 for columns in range(self._no_of_columns):
                  nulls.append(0)
-                join_table._insert(nulls+row_right)
+                join_table._insert(nulls+row_right)#append right table's values and nulls into join table
+                newrow+=1# new row in join table
+                for columns in range(self._no_of_columns):# change every 0 column to Null
+                  join_table.data[newrow-1][columns]='Null'
+                  join_table._update()
 
 
           print(f'## Select ops no. -> {no_of_ops}')
@@ -559,15 +577,17 @@ class Table:
 
            # get the column names of both tables with the table name in front
            # ex. for left -> name becomes left_table_name_name etc
-           left_names = [f'{self.name}{colname}' for colname in self.column_names]
-           right_names = [f'{table_right.name}{colname}' for colname in table_right.column_names]
+           no_of_ops = 0
+           left_names = [f'{self._name}_{colname}' for colname in self.column_names]
+           right_names = [f'{table_right._name}_{colname}' for colname in table_right.column_names]
 
            # define the new tables name, its column names and types
-           join_table_name = f'{self._name}_index_nested_loopjoin{table_right._name}'
+           join_table_name = f'{self._name}_index_nested_loop_join_{table_right._name}'
            join_table_colnames = left_names+right_names
            join_table_coltypes = self.column_types+table_right.column_types
            join_table = Table(name=join_table_name, column_names=join_table_colnames, column_types= join_table_coltypes)
 
+           # for each value in left column, if value was found into index, append the corresponding row to the new table
            for row_left in self.data:
 
             left_value = row_left[column_index_left]
@@ -604,9 +624,11 @@ class Table:
            join_table_coltypes = self.column_types+table_right.column_types
            join_table = Table(name=join_table_name, column_names=join_table_colnames, column_types= join_table_coltypes)
 
+           #sorting left and right table
            self._sort(column_name_left,asc=asc)
            table_right._sort(column_name_right,asc=asc)
 
+           # for each value in left column and right column, if condition, append the corresponding row to the new table
            for row_left in self.data:
 
             left_value = row_left[column_index_left]
@@ -615,14 +637,13 @@ class Table:
               right_value = row_right[column_index_right]
               if get_op(operator, right_value, left_value):
                 join_table._insert(row_left+row_right)
-              else:
+              else: #if sorting is descending ,if left value > right value we don't need to check for match
                   if asc==False:
                     if left_value>right_value:
                        break
-                  else:
-                       if left_value<right_value:
-                           break
-
+                  else:#if sorting is ascending ,if left value < right value we don't need to check for match
+                    if left_value<right_value:
+                        break
            print(f'## Select ops no. -> {no_of_ops}')
            print(f'# Left table size -> {len(self.data)}')
            print(f'# Right table size -> {len(table_right.data)}')
